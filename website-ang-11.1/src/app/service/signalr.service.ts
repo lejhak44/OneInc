@@ -7,7 +7,7 @@ import { ConfigService } from './config.service';
 })
 export class SignalrService {
 
-  private hubConnectionBuilder!: HubConnection;
+  private hubConnectionBuilder!: signalR.HubConnection | undefined;
 
   onStart = new EventEmitter();
   onClosed = new EventEmitter<any>();
@@ -21,49 +21,51 @@ export class SignalrService {
   }
 
   public async start()
-  {
+  {    
+    this.stop().then(async () => {
 
-    if(!this._isBuild)
-    {
-
-      this._isBuild = true;
       this.hubConnectionBuilder = new HubConnectionBuilder()
       .withUrl(`${ConfigService.API_URL}/messaging`)
       .configureLogging(LogLevel.Information)
       .build();
-    }
-
-    this.hubConnectionBuilder.off("messaging");
-    
-    this.hubConnectionBuilder.onclose((result: any) => {
-
-      this.onClosed.emit(result);
-    });
-
-    this.hubConnectionBuilder.on('SendResultToUser', (result: any) => {
   
-      this.onSendResultToUser.emit(result);
+      this.hubConnectionBuilder.onclose(async (result: any) => {
+  
+        if (this.hubConnectionBuilder) 
+        {
+          await this.hubConnectionBuilder.stop();
+          this.hubConnectionBuilder.off("messaging");
+          this.hubConnectionBuilder = undefined; 
+        }
+        this.onClosed.emit(result);
+      });
+  
+      this.hubConnectionBuilder.on('SendResultToUser', (result: any) => {
+    
+        this.onSendResultToUser.emit(result);
+      });
+  
+      await this.hubConnectionBuilder
+        .start()
+        .then(() => {
+  
+          this.onStart.emit();
+        })
+        .catch(err => {
+  
+          this.stop();
+        });
     });
 
-
-    await this.hubConnectionBuilder
-      .start()
-      .then(() => {
-
-        this.onStart.emit();
-      })
-      .catch(err => {
-
-        this.stop();
-      });
   }
   public async stop()
   {
     if (this.hubConnectionBuilder) 
     {
- 
-      this.hubConnectionBuilder.stop();
-      
+
+      await this.hubConnectionBuilder.stop();
+      if(this.hubConnectionBuilder) this.hubConnectionBuilder.off("messaging");
+      this.hubConnectionBuilder = undefined; 
     }
   }
 }

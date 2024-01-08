@@ -26,7 +26,7 @@ namespace OneInc.TestApi.Controllers
             foreach (char character in convertedText)
             {
 
-                int number = r.Next(1, 5);
+                int number = r.Next(1, 2);
 
                 Thread.Sleep(number * 1000);
 
