@@ -1,0 +1,22 @@
+<div class="container-fluid text-center">
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+
+    </div>
+    <div class="col-sm-8 text-left">
+      <h1>Convert Text To Base64 Format</h1>
+
+      <div class="input-group mb-3">
+        <input  type="text" class="form-control" placeholder="Please input a text" aria-label="Please input a text" [(ngModel)]="forConvertionText" [disabled]="isLoading"
+          aria-describedby="button-addon2">
+          <button *ngIf="!isLoading" class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="BtnConvert_OnCLick()">Convert</button>
+          <button *ngIf="isLoading" class="btn btn-outline-danger" type="button" id="button-addon2" (click)="BtnCancel_OnCLick()">Cancel</button>
+      </div>
+      <hr />
+      <p>Result</p>
+      <p class="alert alert-warning">&nbsp;{{ totalConvertedString }}</p>
+    </div>
+    <div class="col-sm-2 sidenav">
+    </div>
+  </div>
+</div>
