@@ -33,8 +33,8 @@ export class SignalrService {
   
         if (this.hubConnectionBuilder) 
         {
+          if(this.hubConnectionBuilder) this.hubConnectionBuilder.off("SendResultToUser");
           await this.hubConnectionBuilder.stop();
-          this.hubConnectionBuilder.off("messaging");
           this.hubConnectionBuilder = undefined; 
         }
         this.onClosed.emit(result);
@@ -63,8 +63,8 @@ export class SignalrService {
     if (this.hubConnectionBuilder) 
     {
 
+      if(this.hubConnectionBuilder) this.hubConnectionBuilder.off("SendResultToUser");
       await this.hubConnectionBuilder.stop();
-      if(this.hubConnectionBuilder) this.hubConnectionBuilder.off("messaging");
       this.hubConnectionBuilder = undefined; 
     }
   }
